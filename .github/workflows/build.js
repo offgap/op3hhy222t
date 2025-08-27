@@ -1,7 +1,5 @@
 const fs = require('fs').promises;
 const path = require('path');
-const { URL } = require('url');
-const https = require('https');
 
 const CONFIG_PATH = path.join(__dirname, '../../', 'config.json'); // Correct path to config.json
 const BUILD_DIR = path.join(__dirname, '../../', 'build'); // Correct path for the build directory
@@ -31,8 +29,8 @@ async function main() {
   await fs.mkdir(BUILD_DIR, { recursive: true });
 
   // write global assets
-  await fs.writeFile(path.join(BUILD_DIR, 'styles.css'), cfg.css, 'utf8');
-  await fs.writeFile(path.join(BUILD_DIR, 'main.js'), cfg.js, 'utf8');
+  await fs.writeFile(path.join(BUILD_DIR, `${cfg.sid}.css`), cfg.css, 'utf8');
+  await fs.writeFile(path.join(BUILD_DIR, `${cfg.sid}.js`), cfg.js, 'utf8');
 
   const headTags = (cfg.meta.headTags || []).join('\n    ');
   const nav = cfg.pages.reduce((acc, page) => page.path.split('/').length < 4 ? `${acc}<a href="${page.path}">${page.title}</a>` : acc, '');
@@ -54,7 +52,7 @@ async function main() {
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="${fontString(cfg.meta.fonts)}">` : ''}
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="/${cfg.sid}.css">
     <link rel="icon" href="/favicon.ico" type="image/x-icon" sizes="32x32">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
@@ -65,7 +63,7 @@ async function main() {
     <header>${cfg.header.content.replaceAll('<nav></nav>', `<nav>${nav}</nav>`)}</header>` : ''}
     <main>${page.content}</main>${cfg.footer?.content ? `
     <footer>${cfg.footer.content.replaceAll('<nav></nav>', `<nav>${nav}</nav>`)}</footer>` : ''}
-    <script src="/main.js"></script>
+    <script src="/${cfg.sid}.js"></script>
   </body>
 </html>`;
 
